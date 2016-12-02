@@ -32,8 +32,6 @@ class TestBear(Bear):
         self.err('teardown')
         self.err()
 
-    def tear_down(self):
-        shutil.rmtree(self.data_dir)
 
 
 class TypedTestBear(Bear):
@@ -70,6 +68,9 @@ class BearTest(unittest.TestCase):
         self.queue = multiprocessing.Queue()
         self.settings = Section('test_settings')
         self.uut = TestBear(self.settings, self.queue)
+
+    def tearDown(self):
+        shutil.rmtree(self.uut.data_dir)
 
     def test_simple_api(self):
         self.assertRaises(TypeError, TestBear, self.settings, 2)
