@@ -1,3 +1,4 @@
+import logging
 from coala_utils.string_processing.StringConverter import StringConverter
 from coala_utils.string_processing import (unescape, convert_to_raw,
                                            position_is_escaped,
@@ -56,8 +57,20 @@ class LineParser:
             line,
             self.comment_separators)
         comment = unescape(comment)
+
         if line == '':
             return '', [], '', comment
+
+        # Whitespace before and after # unless # is the start of the line
+        logger = logging.getLogger(__name__)
+        if '#' in line:
+            comment_start = line.index('#')
+            if comment_start == 0 and line[1] != ' ':
+                logger.warning('Your line does not have whitespace after #')
+            elif line[comment_start - 1] != ' ' \
+                    or line[comment_start + 1] != ' ':
+                logger.warning(
+                    'Your line does not have whitespace before and after #')
 
         section_name = unescape(self.__get_section_name(line))
         if section_name != '':
